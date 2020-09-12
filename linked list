@@ -1,0 +1,224 @@
+c code 
+%linked lists
+
+#ifndef DSTRUCTS_LL_H_
+#define DSTRUCTS_LL_H_
+#include <stdlib.h>
+typedef unsigned int data_key_t; // nodes can be referenced by KEY//                               
+struct data_struct       
+
+{
+double X;//nodes contain PAYLOAD consisting of various elements and key//
+double Y;
+data_key_t key;
+};
+typedef struct data_struct data_t;
+struct linkedList                     
+{
+data_t payload;                // actualnode/typedef//
+struct linkedList *pNext;      // recursively defined "next" pointer//
+};
+typedef struct linkedList ll_t;
+void setPayload(ll_t*, data_t); //function sets the value of the node's //                                                                                                                                                                                                       
+ll_t* createNode(void); //creates a node of type ll_t from the heap//
+ll_t* addNode(ll_t*, data_t); //adds new node  to the bottom of the list //
+ll_t* insertNode(ll_t*, data_t payload, data_key_t insertionPoint);
+void deleteNode(ll_t*, data_key_t); 
+#endif /* DSTRUCTS_LL_H_ */
+
+
+
+#include <stdlib.h>
+#include "ll_t.h"
+void setPayload(ll_t* node, data_t payload)
+{
+	node->payload.X = payload.X;
+	node->payload.Y = payload.Y;
+	node->payload.key = payload.key;
+}
+
+ll_t* createNode(void)
+{
+ll_t *node;           //create a pointer for the new node //
+
+node=(ll_t*) malloc(sizeof(struct linkedList));//allocate node from heap //
+node->pNext = NULL;    //make next point to NULL //
+return node;// return the pointer to the new node //
+}
+
+ll_t* addNode(ll_t *pHead, data_t payload)
+{
+ll_t *pNode;          //create two node pointers //
+ll_t *pW;
+pNode = createNode();  // prepare the new node to be added //
+setPayload(pNode, payload);  // set new element's data field to value //
+if (pHead == NULL)
+{
+pHead = pNode; // if the linked list has no nodes to begin with //
+}
+else
+{
+pW = pHead;  //search through list until tail node is found //
+
+while ((pW->pNext) != NULL)
+{
+pW = pW->pNext;
+}
+pW->pNext = pNode;  // set the pointer from NULL to temp //
+            }
+return pHead;
+}
+
+ll_t* insertNode(ll_t *pHead, data_t payload, data_key_t insertionPoint)
+{
+if(pHead == NULL){  //If pHead is null create a new node//
+ll_t* newNode = createNode();
+setPayload(newNode,payload); //set its contents using payload//
+pHead = newNode;
+printf("------Added to the empty list -----\n");
+return pHead; //make it as head and returning the head node to pHead //
+}
+else{//If head is not null,then new node to be inserted by temp1 & temp2//
+ll_t* temp1= pHead; 	
+ll_t* temp2= pHead; 	
+while(temp1 && temp1->payload.key!=insertionPoint){
+temp1=temp1-> pNext;//Identification of node matches key,store in temp1//
+}
+if(temp1==NULL){
+printf("\n------Key not found in the list -----\n");
+return pHead;//If the key is not matched,returning head pointer to list//
+}
+else if(temp1==pHead){   //head pointer contains key to be matched//
+ll_t* newNode = createNode(); //creates a node//
+setPayload(newNode,payload);
+newNode->pNext=pHead;    //insert node before the pHead//
+pHead=newNode;            //make the new node as new head pointer//
+printf("\n------Added to the Existing List -----\n");
+return pHead;
+}
+else   //Identify the node before temp1 and store it//
+while(temp2->pNext!=temp1){
+temp2=temp2-> pNext;
+}
+ll_t* newNode = createNode();        //create a new node//
+setPayload(newNode,payload);
+newNode->pNext=temp1;//make pNext of new node point to node having key//
+temp2->pNext=newNode;//make pNext pointer of temp2 point to new node//
+printf("\n------Added to the Existing List -----\n");
+return pHead;
+}
+}
+}
+
+ll_t* deleteNode(ll_t *pHead, data_key_t nodeToDeleteKey)
+{
+if(pHead==NULL) //If the pHead is NULL, indicating empty list//
+{ 
+printf("\n***Node cannot be deleted from empty list***\n");
+}
+else{//find node to be deleted,if present delete it,orelse return pHead// 
+ll_t *temp1=pHead; 
+ll_t *temp2=pHead;  
+while(temp1 && temp1->payload.key!= nodeToDeleteKey){
+temp1=temp1->pNext;
+}
+if(temp1==NULL){//if node does not have key to be matched,generate error//
+printf("\n***Node doesn't exist in the list***\n");
+}
+else if(temp1==pHead){ //delete the pHead node using free(pHead)//
+free(pHead); pHead=temp1->pNext; return pHead;
+printf("\n***Node deleted successfully***\n");
+}
+else{      //identify node before temp1 and store in temp2//
+while(temp2->pNext!=temp1){
+temp2=temp2-> pNext;
+}
+temp2->pNext=temp1->pNext;
+free(temp1);
+}
+printf("\n***Node deleted successfully***\n");
+}
+return pHead;
+}
+
+void display(ll_t *pHead) //display the linked lists//
+
+{       
+ll_t *pW=pHead; 
+data_t token;
+if(pHead == NULL) {printf("List is Empty\n");return;}
+while (pW != NULL)
+{   
+token.X = pW->payload.X;
+token.Y = pW->payload.Y;
+token.key = pW->payload.key;
+printf("%lf %lf %lu\n", token.X, token.Y, token.key);
+pW = pW->pNext;}
+printf("\n-----Linked List printed-----\n\n");
+}
+
+#include <stdlib.h>
+#include <stdio.h>
+#include "ll_t.h"
+
+int main(void)
+{
+ll_t *pLLHead=NULL; // pointer to list, must be initialized to NULL//
+data_t token;// create the linked list from standard input//
+unsigned int keysearch;// user indicates end of data entering 9999//
+int n;  // for X, Y and key values//
+printf("\nLoading data...\n");
+fflush(stdin);
+do{
+printf("\n1: Create Linked List\n");
+printf("\n2: Add single node to end of Linked List\n");
+printf("\n3: Insert a node before KEY in Linked List\n");
+printf("\n4: Delete node from Linked List\n");
+printf("\n5: Print Linked List\n");
+printf("\n6: To terminate the program\n");
+printf("\nEnter the choice (1 to 6): ");
+scanf("%d", &n);
+switch(n)
+{
+case 1:
+printf("\nEnter X, Y, and Key: ");
+scanf("%lf %lf %lu", &token.X, &token.Y, &token.key);
+while (token.X != 9999 && token.Y != 9999 && token.key != 9999)
+{  
+pLLHead =addNode(pLLHead, token);
+printf("\nEnter X, Y, and Key: ");
+scanf("%lf %lf %lu", &token.X, &token.Y, &token.key);
+}
+printf("\n-----Linked List created-----\n\n");
+break;
+case 2:
+printf("\nEnter X, Y, and Key: ");
+scanf("%lf %lf %lu", &token.X, &token.Y, &token.key);
+pLLHead = addNode(pLLHead, token);
+printf("\n------New node is added to the list -----\n");
+break;
+case 3:
+printf("\nEnter the key to find the insertion place: ");
+scanf("%lu",&keysearch);
+printf("Enter X, Y, and Key: ");
+scanf("%lf %lf %lu", &token.X, &token.Y, &token.key);
+printf("\n-----Node Insertion before the key----\n");
+pLLHead = insertNode(pLLHead, token, keysearch);
+break;
+case 4:
+printf("\nEnter the key to delete the node: ");
+scanf("%lu",&keysearch);
+pLLHead=deleteNode(pLLHead, keysearch);
+break;
+case 5:
+printf("\nPrinting the entire linked list to standard output:\n");
+display(pLLHead);//display entire linked output and printed//
+break;
+case 6
+ printf("\n--------Program will terminate now--------");
+ printf("\nEnter any key to terminate: ");
+ exit(0);
+}//END OF SWITCH
+}while(1);     // send linked list to standard output //
+return 0;
+}
